@@ -17,7 +17,8 @@ class AlgoritmoGenetico:
         self.aptidao_perc = [] #porcentagem
         self.numero_geracoes = numero_geracoes
         self.populacao_inicial()
-        #self.grafico = plt.plot([],[])
+        self.fig, self.ax = plt.subplots()
+        self.historico_aptidao = []
     
     def populacao_inicial(self):
         print("Criando pupulação inicial!")
@@ -44,6 +45,7 @@ class AlgoritmoGenetico:
         return 0
 
     def operadores_geneticos(self):
+        print("Iniciando operadores genéticos")
         tx_cruzamento_simples = 30
         tx_cruzamento_uniforme = 70
         tx_elitismo = 0
@@ -56,7 +58,8 @@ class AlgoritmoGenetico:
             self.avaliacao()
             q, apt = self.pegar_melhor_individuo()
             #self.exibe_grafico_evolucao(geracao, apt)
-            #self.exibe_melhor_individuo(geracao)
+            self.historico_aptidao.append(apt)
+            self.exibe_melhor_individuo(geracao)
             
             self.pre_roleta()
             
@@ -80,7 +83,7 @@ class AlgoritmoGenetico:
             
             #elitismo
             qtd = (self.TAM_POP * tx_elitismo)/100
-            print("Elitismo")
+            #print("Elitismo")
             #self.elitismo(qtd)
             
             ## GARANTIR O TAMANHO POPULACIONAL.
@@ -88,11 +91,13 @@ class AlgoritmoGenetico:
              ## mutação
             qtd = (self.TAM_POP * tx_mutacao)/100
             for i in range(int(qtd)):
+                
                 quem = np.random.randint(0, self.TAM_POP)
                 self.mutacao(quem)
             
             self.substituicao()
         #self.grafico.show()
+        #plt.show()
         
     def cruzamento_simples(self, pai1, pai2):
         #print("Cruzamento com 1 ponto de corte.")
@@ -187,6 +192,14 @@ class AlgoritmoGenetico:
         
         print("Geração: {} | Indivíduo: {} | Aptidão: {}".format(geracao, quem, apt))
 
-    def exibe_grafico_evolucao(self, g, apt):
-        self.grafico.plot(g, apt)
+    def exibe_grafico_evolucao(self):
+        self.ax.clear()  # Limpa o gráfico para evitar sobreposição
+        self.ax.plot(range(len(self.historico_aptidao)), self.historico_aptidao, 'bo-')
+        self.ax.set_title('Evolução da Aptidão')
+        self.ax.set_xlabel('Geração')
+        self.ax.set_ylabel('Aptidão')
+  
         
+if __name__ == "__main__":
+    ag = AlgoritmoGenetico(TAM_POP=10, TAM_GENE=10, numero_geracoes=10)
+    ag.operadores_geneticos()
